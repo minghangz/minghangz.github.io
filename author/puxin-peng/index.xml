@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Puxin Peng | Minghang Zheng&#39;s homepage</title>
+    <link>https://minghangz.github.io/author/puxin-peng/</link>
+      <atom:link href="https://minghangz.github.io/author/puxin-peng/index.xml" rel="self" type="application/rss+xml" />
+    <description>Puxin Peng</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>Copyright © 2025 Minghang Zheng</copyright><lastBuildDate>Sun, 20 Jul 2025 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://minghangz.github.io/media/icon_hub259b9e287cb654bd255d2333b0dd2cd_21941_512x512_fill_lanczos_center_3.png</url>
+      <title>Puxin Peng</title>
+      <link>https://minghangz.github.io/author/puxin-peng/</link>
+    </image>
+    
+    <item>
+      <title>Hierarchical Event Memory for Accurate and Low-latency Online Video Temporal Grounding</title>
+      <link>https://minghangz.github.io/publication/onvtg/</link>
+      <pubDate>Sun, 20 Jul 2025 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/onvtg/</guid>
+      <description>&lt;h3 id=&#34;video&#34;&gt;Video&lt;/h3&gt;
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;&#34;&gt;
+    &lt;iframe src=&#34;https://www.youtube.com/embed/xQdlHzqECEM?si=Zs2xrWxGe_53j7lb&#34; 
+            title=&#34;YouTube video player&#34; 
+            frameborder=&#34;0&#34; 
+            allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; 
+            referrerpolicy=&#34;strict-origin-when-cross-origin&#34; 
+            allowfullscreen
+            style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%;&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@inproceedings{zheng-etal-2025-hierarchical,
+    title = &amp;quot;Hierarchical Event Memory for Accurate and Low-latency Online Video Temporal Grounding&amp;quot;,
+    author = &amp;quot;Zheng, Minghang  and
+      Peng, Yuxin  and
+      Sun, Benyuan and
+      Yang, Yi and
+      Liu, Yang&amp;quot;,
+    booktitle = &amp;quot;Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)&amp;quot;,
+    year = &amp;quot;2025&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kunchang Li | Minghang Zheng&#39;s homepage</title>
+    <link>https://minghangz.github.io/author/kunchang-li/</link>
+      <atom:link href="https://minghangz.github.io/author/kunchang-li/index.xml" rel="self" type="application/rss+xml" />
+    <description>Kunchang Li</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>Copyright © 2025 Minghang Zheng</copyright><lastBuildDate>Mon, 22 Nov 2021 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://minghangz.github.io/media/icon_hub259b9e287cb654bd255d2333b0dd2cd_21941_512x512_fill_lanczos_center_3.png</url>
+      <title>Kunchang Li</title>
+      <link>https://minghangz.github.io/author/kunchang-li/</link>
+    </image>
+    
+    <item>
+      <title>End-to-End Object Detection with Adaptive Clustering Transformer</title>
+      <link>https://minghangz.github.io/publication/act/</link>
+      <pubDate>Mon, 22 Nov 2021 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/act/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

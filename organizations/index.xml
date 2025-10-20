@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Organizations | Minghang Zheng&#39;s homepage</title>
+    <link>https://minghangz.github.io/organizations/</link>
+      <atom:link href="https://minghangz.github.io/organizations/index.xml" rel="self" type="application/rss+xml" />
+    <description>Organizations</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>Copyright © 2025 Minghang Zheng</copyright><lastBuildDate>Tue, 29 Mar 2022 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://minghangz.github.io/media/icon_hub259b9e287cb654bd255d2333b0dd2cd_21941_512x512_fill_lanczos_center_3.png</url>
+      <title>Organizations</title>
+      <link>https://minghangz.github.io/organizations/</link>
+    </image>
+    
+  </channel>
+</rss>

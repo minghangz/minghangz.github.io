@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Yanjie Huang | Minghang Zheng&#39;s homepage</title>
+    <link>https://minghangz.github.io/author/yanjie-huang/</link>
+      <atom:link href="https://minghangz.github.io/author/yanjie-huang/index.xml" rel="self" type="application/rss+xml" />
+    <description>Yanjie Huang</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>Copyright © 2025 Minghang Zheng</copyright><lastBuildDate>Tue, 29 Mar 2022 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://minghangz.github.io/media/icon_hub259b9e287cb654bd255d2333b0dd2cd_21941_512x512_fill_lanczos_center_3.png</url>
+      <title>Yanjie Huang</title>
+      <link>https://minghangz.github.io/author/yanjie-huang/</link>
+    </image>
+    
+    <item>
+      <title>Weakly Supervised Temporal Sentence Grounding with Gaussian-based Contrastive Proposal Learning</title>
+      <link>https://minghangz.github.io/publication/cpl/</link>
+      <pubDate>Tue, 29 Mar 2022 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/cpl/</guid>
+      <description>&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@inproceedings{CPL_2022_CVPR,
+    title = {Weakly Supervised Temporal Sentence Grounding with Gaussian-based Contrastive Proposal Learning},
+    author = {Zheng, Minghang and Huang, Yanjie and Chen, Qingchao and Peng, Yuxin and Liu, Yang},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    year = {2022}
+} 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h3&gt;
+&lt;p&gt;This work is supported by the grants from the National Natural Science Foundation of China (61925201, 62132001, U21B2025) and Zhejiang Lab (NO.2022NB0AB05).&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Weakly Supervised Video Moment Localization with Contrastive Negative Sample Mining</title>
+      <link>https://minghangz.github.io/publication/cnm/</link>
+      <pubDate>Tue, 22 Feb 2022 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/cnm/</guid>
+      <description>&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@inproceedings{CNM_2022_AAAI,
+    title = {Weakly Supervised Video Moment Localization with Contrastive Negative Sample Mining},
+    author = {Zheng, Minghang and Huang, Yanjie and Chen, Qingchao and Liu, Yang},
+    booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+    year = {2022}
+} 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h3&gt;
+&lt;p&gt;This work is supported by Zhejiang Lab (NO.2022NB0AB05), State Key Laboratory of Media Convergence Production Technology and Systems, National Engineering Laboratory for Big Data Analysis and Applications Technology. The authors would also like to thank Jiabo Huang and Sizhe Li for helpful suggestions.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
