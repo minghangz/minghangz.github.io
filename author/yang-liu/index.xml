@@ -1,0 +1,1004 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Yang Liu | Minghang Zheng&#39;s homepage</title>
+    <link>https://minghangz.github.io/author/yang-liu/</link>
+      <atom:link href="https://minghangz.github.io/author/yang-liu/index.xml" rel="self" type="application/rss+xml" />
+    <description>Yang Liu</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>Copyright © 2026 Minghang Zheng</copyright><lastBuildDate>Fri, 01 May 2026 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://minghangz.github.io/media/icon_hub259b9e287cb654bd255d2333b0dd2cd_21941_512x512_fill_lanczos_center_3.png</url>
+      <title>Yang Liu</title>
+      <link>https://minghangz.github.io/author/yang-liu/</link>
+    </image>
+    
+    <item>
+      <title>Temporal-Aware Reasoning Optimization for Video Temporal Grounding</title>
+      <link>https://minghangz.github.io/publication/taro/</link>
+      <pubDate>Fri, 01 May 2026 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/taro/</guid>
+      <description>&lt;!-- 
+## Video
+
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;&#34;&gt;
+    &lt;iframe src=&#34;https://www.youtube.com/embed/lrCdZU1fxQ8?si=TBNnnuP0Lp6BI_Qu&#34; 
+            title=&#34;YouTube video player&#34; 
+            frameborder=&#34;0&#34; 
+            allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; 
+            referrerpolicy=&#34;strict-origin-when-cross-origin&#34; 
+            allowfullscreen
+            style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%;&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+
+--- --&gt;
+&lt;h2 id=&#34;-motivation&#34;&gt;💡 Motivation&lt;/h2&gt;
+&lt;div style=&#34;display: flex; flex-wrap: wrap; gap: 24px; margin: 28px 0;&#34;&gt;
+  &lt;!-- Problem Box --&gt;
+  &lt;div style=&#34;flex: 1; min-width: 260px; background: #ffffff; border-left: 5px solid #a0aec0; padding: 20px 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);&#34;&gt;
+    &lt;h3 style=&#34;margin: 0 0 12px 0; color: #2d3748; font-size: 1.1rem; font-weight: 700;&#34;&gt;⚠️ The Problem: “Pretend to Think”&lt;/h3&gt;
+    &lt;p style=&#34;margin-top: 0; color: #4a5568; font-size: 0.95rem;&#34;&gt;Current MLLMs often generate &lt;strong&gt;superficial reasoning&lt;/strong&gt; that provides zero guidance for precise temporal localization.&lt;/p&gt;
+    &lt;div style=&#34;background: #f7fafc; border-radius: 8px; padding: 12px 16px; margin: 16px 0; border: 1px solid #e2e8f0; font-style: italic; color: #4a5568;&#34;&gt;
+      💬 &lt;em&gt;“The video shows a guy plays the saxophone.”&lt;/em&gt;
+    &lt;/div&gt;
+    &lt;ul style=&#34;padding-left: 18px; color: #2d3748; line-height: 1.7; font-size: 0.95rem;&#34;&gt;
+      &lt;li&gt;&lt;strong&gt;Inefficient Random Exploration&lt;/strong&gt;&lt;br&gt;Blind guesses in a vast video search space rarely lead to quality reasoning.&lt;/li&gt;
+      &lt;li style=&#34;margin-top: 10px;&#34;&gt;&lt;strong&gt;Flawed Reward Mechanism&lt;/strong&gt;&lt;br&gt;RL rewards only check final IoU, ignoring whether the reasoning actually uses visual &amp; temporal cues.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+  &lt;!-- Solution Box --&gt;
+  &lt;div style=&#34;flex: 1; min-width: 260px; background: #ffffff; border-left: 5px solid #38a169; padding: 20px 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);&#34;&gt;
+    &lt;h3 style=&#34;margin: 0 0 12px 0; color: #276749; font-size: 1.1rem; font-weight: 700;&#34;&gt;✨ Our Solution: Thinking &lt;em&gt;with&lt;/em&gt; Time&lt;/h3&gt;
+    &lt;p style=&#34;margin-top: 0; color: #4a5568; font-size: 0.95rem;&#34;&gt;We propose &lt;strong&gt;TaRO&lt;/strong&gt; (Temporal-Aware Reasoning Optimization), a framework that forces the model to master &lt;strong&gt;“Thinking with Time.”&lt;/strong&gt;&lt;/p&gt;
+    &lt;div style=&#34;background: #f0fff4; border-radius: 8px; padding: 12px 16px; margin: 16px 0; border: 1px solid #c6f6d5; font-style: italic; color: #2d3748;&#34;&gt;
+      ✅ &lt;em&gt;“From 0s to 12s, he plays the saxophone for the first time. From 55s to 93s, he plays the saxophone again.”&lt;/em&gt;
+    &lt;/div&gt;
+    &lt;p style=&#34;color: #2d3748; line-height: 1.7; font-size: 0.95rem;&#34;&gt;High-quality reasoning anchors events to &lt;strong&gt;specific timestamps&lt;/strong&gt; and visual evidence, enabling precise temporal localization.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;-method-overview&#34;&gt;🛠️ Method Overview&lt;/h2&gt;
+&lt;p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure  &gt;
+  &lt;div class=&#34;d-flex justify-content-center&#34;&gt;
+    &lt;div class=&#34;w-100&#34; &gt;&lt;img alt=&#34;pipeline&#34; srcset=&#34;
+               /publication/taro/method_hueb9f9bf6d367e79196196d39623c525d_418404_c85098fb40064e179c1bd6e7baea4408.png 400w,
+               /publication/taro/method_hueb9f9bf6d367e79196196d39623c525d_418404_7190381611973a52abcef37969144e30.png 760w,
+               /publication/taro/method_hueb9f9bf6d367e79196196d39623c525d_418404_1200x1200_fit_lanczos_3.png 1200w&#34;
+               src=&#34;https://minghangz.github.io/publication/taro/method_hueb9f9bf6d367e79196196d39623c525d_418404_c85098fb40064e179c1bd6e7baea4408.png&#34;
+               width=&#34;760&#34;
+               height=&#34;586&#34;
+               loading=&#34;lazy&#34; data-zoomable /&gt;&lt;/div&gt;
+  &lt;/div&gt;&lt;/figure&gt;
+&lt;/p&gt;
+&lt;div style=&#34;display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-top: 32px;&#34;&gt;
+  &lt;!-- Card 1 --&gt;
+  &lt;div style=&#34;background: #ffffff; border-radius: 14px; padding: 28px 22px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); border-top: 5px solid #3182ce; transition: transform 0.2s;&#34;&gt;
+    &lt;div style=&#34;font-size: 2rem; margin-bottom: 8px;&#34;&gt;🔍&lt;/div&gt;
+    &lt;h4 style=&#34;margin: 0 0 12px 0; font-size: 1.1rem; color: #1a202c;&#34;&gt;Constructive Reasoning&lt;/h4&gt;
+    &lt;p style=&#34;color: #4a5568; line-height: 1.65; margin: 0;&#34;&gt;
+      Pre‑generated &lt;strong style=&#34;color: #1a202c;&#34;&gt;dense captions&lt;/strong&gt; supply atomic events with timestamps. 
+      By concatenating them, we construct informative reasoning paths that teach the model to 
+      identify &lt;strong style=&#34;color: #3182ce;&#34;&gt;critical visual cues&lt;/strong&gt; and filter out distractors.
+    &lt;/p&gt;
+  &lt;/div&gt;
+  &lt;!-- Card 2 --&gt;
+  &lt;div style=&#34;background: #ffffff; border-radius: 14px; padding: 28px 22px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); border-top: 5px solid #dd6b20; transition: transform 0.2s;&#34;&gt;
+    &lt;div style=&#34;font-size: 2rem; margin-bottom: 8px;&#34;&gt;⏱️&lt;/div&gt;
+    &lt;h4 style=&#34;margin: 0 0 12px 0; font-size: 1.1rem; color: #1a202c;&#34;&gt;Temporal‑Sensitive Reward&lt;/h4&gt;
+    &lt;p style=&#34;color: #4a5568; line-height: 1.65; margin: 0;&#34;&gt;
+      Frames near ground‑truth boundaries are &lt;strong style=&#34;color: #1a202c;&#34;&gt;locally shuffled&lt;/strong&gt;. 
+      If the reasoning truly relies on temporal structure, this perturbation breaks it, causing a 
+      &lt;strong style=&#34;color: #dd6b20;&#34;&gt;confidence drop&lt;/strong&gt;, which we use as a reward that enforces 
+      tight visual‑temporal coupling.
+    &lt;/p&gt;
+  &lt;/div&gt;
+  &lt;!-- Card 3 --&gt;
+  &lt;div style=&#34;background: #ffffff; border-radius: 14px; padding: 28px 22px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); border-top: 5px solid #38a169; transition: transform 0.2s;&#34;&gt;
+    &lt;div style=&#34;font-size: 2rem; margin-bottom: 8px;&#34;&gt;🎓&lt;/div&gt;
+    &lt;h4 style=&#34;margin: 0 0 12px 0; font-size: 1.1rem; color: #1a202c;&#34;&gt;Progressive Curriculum&lt;/h4&gt;
+    &lt;p style=&#34;color: #4a5568; line-height: 1.65; margin: 0;&#34;&gt;
+      A &lt;strong style=&#34;color: #1a202c;&#34;&gt;two‑stage curriculum&lt;/strong&gt;: first, the model learns from 
+      constructed reasoning trajectories; then it advances to a 
+      &lt;strong style=&#34;color: #38a169;&#34;&gt;self‑exploration phase&lt;/strong&gt;, autonomously refining strategies 
+      under both our temporal‑sensitive reward and standard IoU reward.
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;-key-results&#34;&gt;📊 Key Results&lt;/h2&gt;
+&lt;div style=&#34;background: #f7fafc; border-radius: 16px; padding: 8px 24px 24px 24px; margin: 32px 0; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03);&#34;&gt;
+  &lt;h3 style=&#34;margin: 16px 0 4px 0; color: #1a202c; font-size: 1.2rem;&#34;&gt;🏆 State‑of‑the‑Art on Four VTG Benchmarks&lt;/h3&gt;
+  &lt;p style=&#34;color: #4a5568; margin-bottom: 20px; font-size: 0.95rem;&#34;&gt;All experiments use &lt;code style=&#34;background: #edf2f7; padding: 2px 6px; border-radius: 4px;&#34;&gt;Qwen2.5-VL-7B-Instruct&lt;/code&gt; as the base model. TaRO consistently surpasses the previous strongest RL‑based baseline, &lt;strong&gt;Time‑R1&lt;/strong&gt;.&lt;/p&gt;
+  &lt;div style=&#34;border-radius: 12px; overflow-x: auto; box-shadow: 0 2px 12px rgba(0,0,0,0.04);&#34;&gt;
+    &lt;table style=&#34;width: 100%; min-width: 650px; display: table; table-layout: fixed; border-collapse: collapse; background: white; margin: 0;&#34;&gt;
+      &lt;thead&gt;
+        &lt;tr style=&#34;background: #1a202c; color: white;&#34;&gt;
+          &lt;th style=&#34;padding: 14px 16px; text-align: left; font-weight: 600;&#34;&gt;Dataset&lt;/th&gt;
+          &lt;th style=&#34;padding: 14px 16px; text-align: center; font-weight: 600;&#34;&gt;Metric&lt;/th&gt;
+          &lt;th style=&#34;padding: 14px 16px; text-align: center; font-weight: 600;&#34;&gt;Time‑R1&lt;/th&gt;
+          &lt;th style=&#34;padding: 14px 16px; text-align: center; font-weight: 600; background: #319795; color: white;&#34;&gt;TaRO (Ours)&lt;/th&gt;
+          &lt;th style=&#34;padding: 14px 16px; text-align: center; font-weight: 600;&#34;&gt;Δ Improvement&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;
+          &lt;td style=&#34;padding: 14px 16px; font-weight: 600; border-bottom: 1px solid #e2e8f0;&#34;&gt;Charades‑STA&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; border-bottom: 1px solid #e2e8f0;&#34;&gt;R1@0.5&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; border-bottom: 1px solid #e2e8f0;&#34;&gt;60.8&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; font-weight: 700; color: #319795; background: #e6fffa; border-bottom: 1px solid #e2e8f0;&#34;&gt;64.8&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; font-weight: 700; color: #38a169; border-bottom: 1px solid #e2e8f0;&#34;&gt;🚀 +4.0%&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr style=&#34;background: #f7fafc;&#34;&gt;
+          &lt;td style=&#34;padding: 14px 16px; font-weight: 600; border-bottom: 1px solid #e2e8f0;&#34;&gt;ActivityNet&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; border-bottom: 1px solid #e2e8f0;&#34;&gt;R1@0.5&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; border-bottom: 1px solid #e2e8f0;&#34;&gt;39.0&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; font-weight: 700; color: #319795; background: #e6fffa; border-bottom: 1px solid #e2e8f0;&#34;&gt;39.8&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; font-weight: 700; color: #38a169; border-bottom: 1px solid #e2e8f0;&#34;&gt;🚀 +0.8%&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          &lt;td style=&#34;padding: 14px 16px; font-weight: 600; border-bottom: 1px solid #e2e8f0;&#34;&gt;QVHighlights&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; border-bottom: 1px solid #e2e8f0;&#34;&gt;R1@0.5&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; border-bottom: 1px solid #e2e8f0;&#34;&gt;66.2&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; font-weight: 700; color: #319795; background: #e6fffa; border-bottom: 1px solid #e2e8f0;&#34;&gt;69.4&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; font-weight: 700; color: #38a169; border-bottom: 1px solid #e2e8f0;&#34;&gt;🚀 +3.2%&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr style=&#34;background: #f7fafc;&#34;&gt;
+          &lt;td style=&#34;padding: 14px 16px; font-weight: 600;&#34;&gt;TVGBench&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center;&#34;&gt;R1@0.5&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center;&#34;&gt;29.4&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; font-weight: 700; color: #319795; background: #e6fffa;&#34;&gt;37.8&lt;/td&gt;
+          &lt;td style=&#34;padding: 14px 16px; text-align: center; font-weight: 700; color: #38a169;&#34;&gt;🚀 +8.4%&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;-citation&#34;&gt;📖 Citation&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@InProceedings{Zheng_2026_ICML,
+    author    = {Zheng, Minghang and Yin, Zihao and Yang, Yi and Peng, Yuxin and Liu, Yang},
+    title     = {Temporal-Aware Reasoning Optimization for Video Temporal Grounding},
+    booktitle = {International Conference on Machine Learning},
+    year      = {2026}
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>OmniVTG: A Large-Scale Dataset and Training Paradigm for Open-World Video Temporal Grounding</title>
+      <link>https://minghangz.github.io/publication/omnivtg/</link>
+      <pubDate>Mon, 16 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/omnivtg/</guid>
+      <description>&lt;h2 id=&#34;video&#34;&gt;Video&lt;/h2&gt;
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;&#34;&gt;
+    &lt;iframe src=&#34;https://www.youtube.com/embed/lrCdZU1fxQ8?si=TBNnnuP0Lp6BI_Qu&#34; 
+            title=&#34;YouTube video player&#34; 
+            frameborder=&#34;0&#34; 
+            allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; 
+            referrerpolicy=&#34;strict-origin-when-cross-origin&#34; 
+            allowfullscreen
+            style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%;&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;method&#34;&gt;Method&lt;/h2&gt;
+&lt;div style=&#34;background: var(--vtg-card-bg); padding: 24px; border-radius: 16px; box-shadow: 0 4px 20px -10px rgba(0,0,0,0.1); border: 1px solid var(--vtg-border); margin-bottom: 32px;&#34;&gt;
+  &lt;img src=&#34;https://minghangz.github.io/uploads/OmniVTG/method.png&#34; alt=&#34;OmniVTG Method Pipeline&#34; style=&#34;width:100%; border-radius: 8px; margin-bottom: 20px;&#34;&gt;
+  &lt;div style=&#34;font-size: 0.95rem; line-height: 1.6; color: var(--vtg-text-main);&#34;&gt;
+    &lt;strong&gt;Ours Contributions&lt;/strong&gt;
+    &lt;ul style=&#34;margin-top: 8px; margin-bottom: 0; padding-left: 20px; color: var(--vtg-text-sub);&#34;&gt;
+      &lt;li style=&#34;margin-bottom: 6px;&#34;&gt;&lt;strong style=&#34;color: var(--vtg-text-main);&#34;&gt;OmniVTG Dataset:&lt;/strong&gt; over 2,000 hours of video and rich semantic diversity&lt;/li&gt;
+      &lt;li style=&#34;margin-bottom: 6px;&#34;&gt;&lt;strong style=&#34;color: var(--vtg-text-main);&#34;&gt;Data Engine:&lt;/strong&gt; Semantic Coverage Iterative Expansion pipeline to discover out-of-vocabulary concepts, combined with a caption-centric prompting strategy to automately generate dense, high-quality grounding annotations&lt;/li&gt;&lt;/li&gt;
+      &lt;li style=&#34;margin-bottom: 6px;&#34;&gt;&lt;strong style=&#34;color: var(--vtg-text-main);&#34;&gt;Self-Correction CoT:&lt;/strong&gt; first make a coarse prediction of the target timestamps, then zoom in and refine it using its video understanding capabilities&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;visualizations&#34;&gt;Visualizations&lt;/h2&gt;
+&lt;style&gt;
+/* Modern typography and base variables */
+:root {
+  --vtg-primary: #007aff;
+  --vtg-success: #34c759;
+  --vtg-info: #5ac8fa;
+  --vtg-bg: #f5f5f7;
+  --vtg-card-bg: #ffffff;
+  --vtg-text-main: #1d1d1f;
+  --vtg-text-sub: #86868b;
+  --vtg-border: rgba(0,0,0,0.08);
+}
+
+.omnivtg-viz {
+  margin: 24px 0;
+  font-family: -apple-system, BlinkMacSystemFont, &#34;SF Pro Text&#34;, &#34;Segoe UI&#34;, Roboto, Helvetica, Arial, sans-serif;
+  color: var(--vtg-text-main);
+}
+
+.omnivtg-viz h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 32px 0 16px;
+  color: var(--vtg-text-main);
+  border: none;
+}
+
+/* Gallery Card Container */
+.omnivtg-carousel {
+  background: var(--vtg-card-bg);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  margin-bottom: 32px;
+  border: 1px solid var(--vtg-border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.omnivtg-carousel:hover {
+  box-shadow: 0 12px 40px -10px rgba(0,0,0,0.15);
+}
+
+.omnivtg-carousel .carousel-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Video Section with Overlay Navigation */
+.omnivtg-carousel .video-section {
+  position: relative;
+  background: #000;
+  aspect-ratio: 16/9;
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid var(--vtg-border);
+}
+
+.omnivtg-carousel .video-section video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Overlay Navigation Buttons */
+.omnivtg-carousel .nav-btn-overlay {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+.omnivtg-carousel .video-section:hover .nav-btn-overlay {
+  opacity: 1;
+}
+
+.omnivtg-carousel .nav-btn-overlay:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.omnivtg-carousel .nav-btn-overlay:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.nav-left { left: 16px; }
+.nav-right { right: 16px; }
+
+/* Info Section */
+.omnivtg-carousel .info-section {
+  padding: 20px 24px;
+}
+
+.omnivtg-carousel .header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.omnivtg-carousel .counter-badge {
+  background: var(--vtg-bg);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--vtg-text-sub);
+  letter-spacing: 0.5px;
+}
+
+.omnivtg-carousel .query-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--vtg-bg);
+  padding: 4px;
+  border-radius: 20px;
+}
+
+.omnivtg-carousel .qnav-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--vtg-text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+
+.omnivtg-carousel .qnav-btn:hover {
+  background: var(--vtg-primary);
+  color: white;
+}
+
+.omnivtg-carousel .qnav-indicator {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--vtg-text-main);
+  padding: 0 8px;
+}
+
+/* Query Box */
+.omnivtg-carousel .query-box {
+  background: var(--vtg-bg);
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--vtg-text-main);
+  position: relative;
+}
+
+.omnivtg-carousel .query-label {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--vtg-text-sub);
+  margin-bottom: 4px;
+}
+
+/* Timeline Aesthetics */
+.omnivtg-carousel .timeline-bar-outer {
+  position: relative;
+  height: 8px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 4px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.omnivtg-carousel .timeline-bar-inner {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+/* Jump Buttons */
+.omnivtg-carousel .jump-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.omnivtg-carousel .jump-btn {
+  background: white;
+  border: 1px solid var(--vtg-border);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--vtg-text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.omnivtg-carousel .jump-btn:hover {
+  background: var(--vtg-bg);
+  border-color: rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+/* Model Output Rows */
+.omnivtg-carousel .model-row {
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid var(--vtg-border);
+}
+
+.omnivtg-carousel .model-row.gt {
+  background: rgba(52, 199, 89, 0.04);
+  border-color: rgba(52, 199, 89, 0.2);
+}
+
+.omnivtg-carousel .model-row.omni {
+  background: rgba(0, 122, 255, 0.04);
+  border-color: rgba(0, 122, 255, 0.2);
+}
+
+.omnivtg-carousel .model-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.omnivtg-carousel .model-row.gt .model-label { color: var(--vtg-success); }
+.omnivtg-carousel .model-row.omni .model-label { color: var(--vtg-primary); }
+
+.omnivtg-carousel .think-text {
+  font-size: 0.85rem;
+  color: #4b5563;
+  background: rgba(255,255,255,0.6);
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 8px 0;
+  border: 1px solid var(--vtg-border);
+  line-height: 1.5;
+}
+
+.omnivtg-carousel .init-pred-row {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--vtg-border);
+}
+
+.omnivtg-carousel .init-pred-row .pred-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--vtg-info);
+  margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+  .omnivtg-carousel .info-section { padding: 16px; }
+  .omnivtg-carousel .nav-btn-overlay { width: 36px; height: 36px; font-size: 14px; }
+  .nav-left { left: 8px; }
+  .nav-right { right: 8px; }
+}
+&lt;/style&gt;
+&lt;div class=&#34;omnivtg-viz&#34;&gt;
+&lt;h4&gt;OmniVTG Dataset Samples&lt;/h4&gt;
+&lt;div class=&#34;omnivtg-carousel&#34; id=&#34;carousel-omni&#34;&gt;
+  &lt;div class=&#34;carousel-inner&#34;&gt;
+    &lt;div class=&#34;video-section&#34;&gt;
+      &lt;button class=&#34;nav-btn-overlay nav-left&#34; onclick=&#34;navVideo(&#39;omni&#39;, -1)&#34; title=&#34;Previous video&#34;&gt;&amp;#10094;&lt;/button&gt;
+      &lt;video id=&#34;video-omni&#34; controls preload=&#34;metadata&#34; playsinline&gt;&lt;/video&gt;
+      &lt;button class=&#34;nav-btn-overlay nav-right&#34; onclick=&#34;navVideo(&#39;omni&#39;, 1)&#34; title=&#34;Next video&#34;&gt;&amp;#10095;&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&#34;info-section&#34;&gt;
+      &lt;div class=&#34;header-row&#34;&gt;
+        &lt;div class=&#34;counter-badge&#34;&gt;Video &lt;strong id=&#34;vididx-omni&#34;&gt;1&lt;/strong&gt; / &lt;span id=&#34;vidtotal-omni&#34;&gt;5&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&#34;query-nav&#34;&gt;
+          &lt;button class=&#34;qnav-btn&#34; onclick=&#34;navQuery(&#39;omni&#39;, -1)&#34; title=&#34;Previous query&#34;&gt;&amp;#10094;&lt;/button&gt;
+          &lt;span class=&#34;qnav-indicator&#34;&gt;Query &lt;strong id=&#34;qidx-omni&#34;&gt;1&lt;/strong&gt;/&lt;span id=&#34;qtotal-omni&#34;&gt;7&lt;/span&gt;&lt;/span&gt;
+          &lt;button class=&#34;qnav-btn&#34; onclick=&#34;navQuery(&#39;omni&#39;, 1)&#34; title=&#34;Next query&#34;&gt;&amp;#10095;&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&#34;query-box&#34;&gt;
+        &lt;div class=&#34;query-label&#34;&gt;Current Query&lt;/div&gt;
+        &lt;div id=&#34;querytext-omni&#34;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div id=&#34;timeline-omni&#34;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h4&gt;Qualitative Comparison: OmniVTG Test Set&lt;/h4&gt;
+&lt;div class=&#34;omnivtg-carousel&#34; id=&#34;carousel-omni-test&#34;&gt;
+  &lt;div class=&#34;carousel-inner&#34;&gt;
+    &lt;div class=&#34;video-section&#34;&gt;
+      &lt;button class=&#34;nav-btn-overlay nav-left&#34; onclick=&#34;navVideo(&#39;omni-test&#39;, -1)&#34; title=&#34;Previous case&#34;&gt;&amp;#10094;&lt;/button&gt;
+      &lt;video id=&#34;video-omni-test&#34; controls preload=&#34;metadata&#34; playsinline&gt;&lt;/video&gt;
+      &lt;button class=&#34;nav-btn-overlay nav-right&#34; onclick=&#34;navVideo(&#39;omni-test&#39;, 1)&#34; title=&#34;Next case&#34;&gt;&amp;#10095;&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&#34;info-section&#34;&gt;
+      &lt;div class=&#34;header-row&#34;&gt;
+        &lt;div class=&#34;counter-badge&#34;&gt;Case &lt;strong id=&#34;vididx-omni-test&#34;&gt;1&lt;/strong&gt; / &lt;span id=&#34;vidtotal-omni-test&#34;&gt;5&lt;/span&gt;&lt;/div&gt;
+        &lt;span style=&#34;font-size:0.75rem;color:var(--vtg-text-sub);&#34;&gt;Use arrow keys to browse&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&#34;query-box&#34;&gt;
+        &lt;div class=&#34;query-label&#34;&gt;Query&lt;/div&gt;
+        &lt;div id=&#34;querytext-omni-test&#34;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div id=&#34;models-omni-test&#34;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h4&gt;Qualitative Comparison: Charades-STA&lt;/h4&gt;
+&lt;div class=&#34;omnivtg-carousel&#34; id=&#34;carousel-charades&#34;&gt;
+  &lt;div class=&#34;carousel-inner&#34;&gt;
+    &lt;div class=&#34;video-section&#34;&gt;
+      &lt;button class=&#34;nav-btn-overlay nav-left&#34; onclick=&#34;navVideo(&#39;charades&#39;, -1)&#34; title=&#34;Previous case&#34;&gt;&amp;#10094;&lt;/button&gt;
+      &lt;video id=&#34;video-charades&#34; controls preload=&#34;metadata&#34; playsinline&gt;&lt;/video&gt;
+      &lt;button class=&#34;nav-btn-overlay nav-right&#34; onclick=&#34;navVideo(&#39;charades&#39;, 1)&#34; title=&#34;Next case&#34;&gt;&amp;#10095;&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&#34;info-section&#34;&gt;
+      &lt;div class=&#34;header-row&#34;&gt;
+        &lt;div class=&#34;counter-badge&#34;&gt;Case &lt;strong id=&#34;vididx-charades&#34;&gt;1&lt;/strong&gt; / &lt;span id=&#34;vidtotal-charades&#34;&gt;4&lt;/span&gt;&lt;/div&gt;
+        &lt;span style=&#34;font-size:0.75rem;color:var(--vtg-text-sub);&#34;&gt;Use arrow keys to browse&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&#34;query-box&#34;&gt;
+        &lt;div class=&#34;query-label&#34;&gt;Query&lt;/div&gt;
+        &lt;div id=&#34;querytext-charades&#34;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div id=&#34;models-charades&#34;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;h4&gt;Qualitative Comparison: ActivityNet Captions&lt;/h4&gt;
+&lt;div class=&#34;omnivtg-carousel&#34; id=&#34;carousel-activitynet&#34;&gt;
+  &lt;div class=&#34;carousel-inner&#34;&gt;
+    &lt;div class=&#34;video-section&#34;&gt;
+      &lt;button class=&#34;nav-btn-overlay nav-left&#34; onclick=&#34;navVideo(&#39;activitynet&#39;, -1)&#34; title=&#34;Previous case&#34;&gt;&amp;#10094;&lt;/button&gt;
+      &lt;video id=&#34;video-activitynet&#34; controls preload=&#34;metadata&#34; playsinline&gt;&lt;/video&gt;
+      &lt;button class=&#34;nav-btn-overlay nav-right&#34; onclick=&#34;navVideo(&#39;activitynet&#39;, 1)&#34; title=&#34;Next case&#34;&gt;&amp;#10095;&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&#34;info-section&#34;&gt;
+      &lt;div class=&#34;header-row&#34;&gt;
+        &lt;div class=&#34;counter-badge&#34;&gt;Case &lt;strong id=&#34;vididx-activitynet&#34;&gt;1&lt;/strong&gt; / &lt;span id=&#34;vidtotal-activitynet&#34;&gt;4&lt;/span&gt;&lt;/div&gt;
+        &lt;span style=&#34;font-size:0.75rem;color:var(--vtg-text-sub);&#34;&gt;Use arrow keys to browse&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class=&#34;query-box&#34;&gt;
+        &lt;div class=&#34;query-label&#34;&gt;Query&lt;/div&gt;
+        &lt;div id=&#34;querytext-activitynet&#34;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div id=&#34;models-activitynet&#34;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script src=&#34;https://minghangz.github.io/uploads/OmniVTG/data.js&#34;&gt;&lt;/script&gt;
+&lt;script&gt;
+(function() {
+  // --- STATE ---
+  const state = {
+    omni:       { vIdx: 0, qIdx: 0 },
+    &#39;omni-test&#39;:{ vIdx: 0 },
+    charades:   { vIdx: 0 },
+    activitynet:{ vIdx: 0 }
+  };
+
+  // --- HELPERS ---
+  function fmtTime(s) {
+    if (s == null) return &#39;00:00&#39;;
+    const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+    return String(m).padStart(2,&#39;0&#39;) + &#39;:&#39; + String(sec).padStart(2,&#39;0&#39;);
+  }
+
+  function timelineHTML(start, end, duration, color) {
+    const left = Math.max(0, start / duration * 100);
+    let w = Math.max(0, (end - start) / duration * 100);
+    if (w &lt; 0.5) w = 0.5;
+    const tip = fmtTime(start) + &#39; - &#39; + fmtTime(end) + &#39; (&#39; + start.toFixed(1) + &#39;s - &#39; + end.toFixed(1) + &#39;s)&#39;;
+    return &#39;&lt;div class=&#34;timeline-bar-outer&#34;&gt;&lt;div class=&#34;timeline-bar-inner&#34; style=&#34;left:&#39;+left+&#39;%;width:&#39;+w+&#39;%;background:&#39;+color+&#39;&#34; title=&#34;&#39;+tip+&#39;&#34;&gt;&lt;/div&gt;&lt;/div&gt;&#39;;
+  }
+
+  function jumpBtnsHTML(videoId, start, end) {
+    return &#39;&lt;div class=&#34;jump-btns&#34;&gt;&#39; +
+      &#39;&lt;button class=&#34;jump-btn&#34; onclick=&#34;seekV(\&#39;&#39;+videoId+&#39;\&#39;,&#39;+start+&#39;)&#34;&gt;&lt;span style=&#34;font-size:10px&#34;&gt;&amp;#9654;&lt;/span&gt; Start: &#39;+fmtTime(start)+&#39;&lt;/button&gt;&#39; +
+      &#39;&lt;button class=&#34;jump-btn&#34; onclick=&#34;seekV(\&#39;&#39;+videoId+&#39;\&#39;,&#39;+end+&#39;)&#34;&gt;&lt;span style=&#34;font-size:10px&#34;&gt;&amp;#9654;&lt;/span&gt; End: &#39;+fmtTime(end)+&#39;&lt;/button&gt;&#39; +
+      &#39;&lt;/div&gt;&#39;;
+  }
+
+  window.seekV = function(vidId, t) {
+    var v = document.getElementById(vidId);
+    if (v) { v.currentTime = t; v.play().catch(function(){}); }
+  };
+
+  // --- RENDER: OMNI DATASET ---
+  window.renderOmni = function() {
+    var s = state.omni;
+    var keys = Object.keys(data_omni);
+    if (s.vIdx &gt;= keys.length) s.vIdx = 0;
+    if (s.vIdx &lt; 0) s.vIdx = keys.length - 1;
+    var key = keys[s.vIdx];
+    var info = data_omni[key];
+    var annos = info.annotations;
+    if (s.qIdx &gt;= annos.length) s.qIdx = 0;
+    if (s.qIdx &lt; 0) s.qIdx = annos.length - 1;
+    var anno = annos[s.qIdx];
+
+    document.getElementById(&#39;vididx-omni&#39;).textContent = s.vIdx + 1;
+    document.getElementById(&#39;vidtotal-omni&#39;).textContent = keys.length;
+    document.getElementById(&#39;qidx-omni&#39;).textContent = s.qIdx + 1;
+    document.getElementById(&#39;qtotal-omni&#39;).textContent = annos.length;
+    document.getElementById(&#39;querytext-omni&#39;).textContent = anno.query;
+
+    var vid = document.getElementById(&#39;video-omni&#39;);
+    var oldSrc = vid.querySelector(&#39;source&#39;);
+    if (oldSrc) oldSrc.remove();
+    var src = document.createElement(&#39;source&#39;);
+    src.src = info.video_path;
+    src.type = &#39;video/mp4&#39;;
+    vid.appendChild(src);
+    vid.load();
+
+    var dur = info.duration;
+    var tl = timelineHTML(anno.timestamps[0], anno.timestamps[1], dur, &#39;var(--vtg-success)&#39;);
+    var jb = jumpBtnsHTML(&#39;video-omni&#39;, anno.timestamps[0], anno.timestamps[1]);
+    document.getElementById(&#39;timeline-omni&#39;).innerHTML = tl + jb;
+  };
+
+  // --- RENDER: COMPARISON DATASETS ---
+  function renderComp(sectionId, dataArr) {
+    var s = state[sectionId];
+    if (s.vIdx &gt;= dataArr.length) s.vIdx = 0;
+    if (s.vIdx &lt; 0) s.vIdx = dataArr.length - 1;
+    var item = dataArr[s.vIdx];
+    var meta = item.meta_data;
+    var dur = meta.duration;
+    var vidId = &#39;video-&#39; + sectionId;
+
+    document.getElementById(&#39;vididx-&#39; + sectionId).textContent = s.vIdx + 1;
+    document.getElementById(&#39;vidtotal-&#39; + sectionId).textContent = dataArr.length;
+    document.getElementById(&#39;querytext-&#39; + sectionId).textContent = meta.query;
+
+    var vid = document.getElementById(vidId);
+    var oldSrc = vid.querySelector(&#39;source&#39;);
+    if (oldSrc) oldSrc.remove();
+    var src = document.createElement(&#39;source&#39;);
+    src.src = item.video_path;
+    src.type = &#39;video/mp4&#39;;
+    vid.appendChild(src);
+    vid.load();
+
+    var html = &#39;&#39;;
+
+    // GT
+    if (item.GT) {
+      html += &#39;&lt;div class=&#34;model-row gt&#34;&gt;&lt;div class=&#34;model-label&#34;&gt;&lt;span&gt;🎯&lt;/span&gt; Ground Truth&lt;/div&gt;&#39;;
+      html += timelineHTML(item.GT[0], item.GT[1], dur, &#39;var(--vtg-success)&#39;);
+      html += jumpBtnsHTML(vidId, item.GT[0], item.GT[1]);
+      html += &#39;&lt;/div&gt;&#39;;
+    }
+
+    // OmniVTG (Ours)
+    if (item.OmniVTG) {
+      html += &#39;&lt;div class=&#34;model-row omni&#34;&gt;&lt;div class=&#34;model-label&#34;&gt;&lt;span&gt;✨&lt;/span&gt; OmniVTG (Ours)&lt;/div&gt;&#39;;
+      if (item.OmniVTG.think) {
+        html += &#39;&lt;div class=&#34;think-text&#34;&gt;&lt;strong&gt;🤔 Think:&lt;/strong&gt; &#39; + item.OmniVTG.think + &#39;&lt;/div&gt;&#39;;
+      }
+      if (item.OmniVTG.init_pred) {
+        html += &#39;&lt;div class=&#34;init-pred-row&#34;&gt;&lt;div class=&#34;pred-label&#34;&gt;Initial Prediction:&lt;/div&gt;&#39;;
+        html += timelineHTML(item.OmniVTG.init_pred[0], item.OmniVTG.init_pred[1], dur, &#39;var(--vtg-info)&#39;);
+        html += jumpBtnsHTML(vidId, item.OmniVTG.init_pred[0], item.OmniVTG.init_pred[1]);
+        html += &#39;&lt;/div&gt;&#39;;
+      }
+      html += &#39;&lt;div&gt;&lt;span style=&#34;font-size:0.75rem;font-weight:600;color:var(--vtg-primary);&#34;&gt;Final Prediction:&lt;/span&gt;&#39;;
+      html += timelineHTML(item.OmniVTG.pred[0], item.OmniVTG.pred[1], dur, &#39;var(--vtg-primary)&#39;);
+      html += jumpBtnsHTML(vidId, item.OmniVTG.pred[0], item.OmniVTG.pred[1]);
+      html += &#39;&lt;/div&gt;&lt;/div&gt;&#39;;
+    }
+
+    document.getElementById(&#39;models-&#39; + sectionId).innerHTML = html;
+  }
+
+  // --- NAVIGATION ---
+  window.navVideo = function(sectionId, dir) {
+    var s = state[sectionId];
+    var dataArr;
+    if (sectionId === &#39;omni&#39;) {
+      s.vIdx += dir;
+    } else if (sectionId === &#39;omni-test&#39;) {
+      s.vIdx += dir;
+      dataArr = data_omni_test;
+    } else if (sectionId === &#39;charades&#39;) {
+      s.vIdx += dir;
+      dataArr = data_charades;
+    } else if (sectionId === &#39;activitynet&#39;) {
+      s.vIdx += dir;
+      dataArr = data_activitynet;
+    }
+    // wrap
+    if (sectionId === &#39;omni&#39;) {
+      var keys = Object.keys(data_omni);
+      if (s.vIdx &gt;= keys.length) s.vIdx = 0;
+      if (s.vIdx &lt; 0) s.vIdx = keys.length - 1;
+      s.qIdx = 0;
+      window.renderOmni();
+    } else {
+      if (s.vIdx &gt;= dataArr.length) s.vIdx = 0;
+      if (s.vIdx &lt; 0) s.vIdx = dataArr.length - 1;
+      renderComp(sectionId, dataArr);
+    }
+  };
+
+  window.navQuery = function(sectionId, dir) {
+    if (sectionId !== &#39;omni&#39;) return;
+    state.omni.qIdx += dir;
+    window.renderOmni();
+  };
+
+  // --- KEYBOARD SUPPORT ---
+  document.addEventListener(&#39;keydown&#39;, function(e) {
+    var sections = [&#39;omni&#39;, &#39;omni-test&#39;, &#39;charades&#39;, &#39;activitynet&#39;];
+    for (var i = 0; i &lt; sections.length; i++) {
+      var el = document.getElementById(&#39;carousel-&#39; + sections[i]);
+      if (!el) continue;
+      var rect = el.getBoundingClientRect();
+      if (rect.top &lt; window.innerHeight &amp;&amp; rect.bottom &gt; 0) {
+        if (e.key === &#39;ArrowLeft&#39;) { e.preventDefault(); navVideo(sections[i], -1); return; }
+        if (e.key === &#39;ArrowRight&#39;) { e.preventDefault(); navVideo(sections[i], 1); return; }
+        if (e.key === &#39;ArrowUp&#39;) { e.preventDefault(); navQuery(sections[i], -1); return; }
+        if (e.key === &#39;ArrowDown&#39;) { e.preventDefault(); navQuery(sections[i], 1); return; }
+        break;
+      }
+    }
+  });
+
+  // --- INIT ---
+  function init() {
+    if (typeof data_omni !== &#39;undefined&#39;) window.renderOmni();
+    if (typeof data_omni_test !== &#39;undefined&#39;) renderComp(&#39;omni-test&#39;, data_omni_test);
+    if (typeof data_charades !== &#39;undefined&#39;) renderComp(&#39;charades&#39;, data_charades);
+    if (typeof data_activitynet !== &#39;undefined&#39;) renderComp(&#39;activitynet&#39;, data_activitynet);
+  }
+
+  if (document.readyState === &#39;loading&#39;) {
+    document.addEventListener(&#39;DOMContentLoaded&#39;, init);
+  } else {
+    init();
+  }
+})();
+&lt;/script&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;citation&#34;&gt;Citation&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@InProceedings{Zheng_2026_CVPR,
+    author    = {Zheng, Minghang and Yin, Zihao and Yang, Yi and Peng, Yuxin and Liu, Yang},
+    title     = {OmniVTG: A Large-Scale Dataset and Training Paradigm for Open-World Video Temporal Grounding},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2026},
+    pages     = {24620-24629}
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Hierarchical Event Memory for Accurate and Low-latency Online Video Temporal Grounding</title>
+      <link>https://minghangz.github.io/publication/onvtg/</link>
+      <pubDate>Sun, 20 Jul 2025 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/onvtg/</guid>
+      <description>&lt;h3 id=&#34;video&#34;&gt;Video&lt;/h3&gt;
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;&#34;&gt;
+    &lt;iframe src=&#34;https://www.youtube.com/embed/xQdlHzqECEM?si=Zs2xrWxGe_53j7lb&#34; 
+            title=&#34;YouTube video player&#34; 
+            frameborder=&#34;0&#34; 
+            allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; 
+            referrerpolicy=&#34;strict-origin-when-cross-origin&#34; 
+            allowfullscreen
+            style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%;&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@inproceedings{zheng-etal-2025-hierarchical,
+    title = &amp;quot;Hierarchical Event Memory for Accurate and Low-latency Online Video Temporal Grounding&amp;quot;,
+    author = &amp;quot;Zheng, Minghang  and
+      Peng, Yuxin  and
+      Sun, Benyuan and
+      Yang, Yi and
+      Liu, Yang&amp;quot;,
+    booktitle = &amp;quot;Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)&amp;quot;,
+    year = &amp;quot;2025&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ResVG: Enhancing Relation and Semantic Understanding in Multiple Instances for Visual Grounding</title>
+      <link>https://minghangz.github.io/publication/resvg/</link>
+      <pubDate>Sun, 01 Sep 2024 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/resvg/</guid>
+      <description>&lt;h3 id=&#34;video&#34;&gt;Video&lt;/h3&gt;
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;&#34;&gt;
+    &lt;iframe src=&#34;https://www.youtube.com/embed/Mtxkklph16o?si=DmfpRi8Y-jh2PRR7&#34; 
+            title=&#34;YouTube video player&#34; 
+            frameborder=&#34;0&#34; 
+            allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; 
+            referrerpolicy=&#34;strict-origin-when-cross-origin&#34; 
+            allowfullscreen
+            style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%;&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@inproceedings{zheng-etal-2024-training,
+    title = &amp;quot;ResVG: Enhancing Relation and Semantic Understanding in Multiple Instances for Visual Grounding&amp;quot;,
+    author = &amp;quot;Zheng, Minghang and Zhang, Jiahua and Chen, Qingchao and Peng, Yuxin and Liu, Yang&amp;quot;,
+    booktitle = &amp;quot;Proceedings of the 31st ACM International Conference on Multimedia&amp;quot;,
+    year = &amp;quot;2024&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h3&gt;
+&lt;p&gt;This work was supported by grants from the National Natural Science Foundation of China (62372014, 61925201, 62132001, U22B2048).&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Training-free Video Temporal Grounding usingLarge-scale Pre-trained Models</title>
+      <link>https://minghangz.github.io/publication/tfvtg/</link>
+      <pubDate>Thu, 01 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/tfvtg/</guid>
+      <description>&lt;h3 id=&#34;video&#34;&gt;Video&lt;/h3&gt;
+&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;&#34;&gt;
+    &lt;iframe src=&#34;https://www.youtube.com/embed/TQ6GBhwzRhg?si=CliwWuOBq2gp7N98&#34; 
+            title=&#34;YouTube video player&#34; 
+            frameborder=&#34;0&#34; 
+            allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; 
+            referrerpolicy=&#34;strict-origin-when-cross-origin&#34; 
+            allowfullscreen
+            style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%;&#34;&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@inproceedings{zheng-etal-2024-training,
+    title = &amp;quot;Training-free Video Temporal Grounding usingLarge-scale Pre-trained Models&amp;quot;,
+    author = &amp;quot;Zheng, Minghang  and
+      Cai, Xinhao  and
+      Chen, Qingchao  and
+      Peng, Yuxin  and
+      Liu, Yang&amp;quot;,
+    booktitle = &amp;quot;Proceedings of the European Conference on Computer Vision (ECCV)&amp;quot;,
+    year = &amp;quot;2024&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h3&gt;
+&lt;p&gt;This work was supported by grants from the National Natural Science Foundation of China (62372014, 61925201, 62132001, U22B2048).&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Generating Structured Pseudo Labels for Noise-resistant Zero-shot Video Sentence Localization</title>
+      <link>https://minghangz.github.io/publication/spl/</link>
+      <pubDate>Mon, 10 Jul 2023 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/spl/</guid>
+      <description>&lt;h3 id=&#34;video&#34;&gt;Video&lt;/h3&gt;
+&lt;div&gt;
+&lt;center&gt;
+&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/-IlFc2IH-E0&#34; title=&#34;YouTube video player&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@inproceedings{zheng-etal-2023-generating,
+    title = &amp;quot;Generating Structured Pseudo Labels for Noise-resistant Zero-shot Video Sentence Localization&amp;quot;,
+    author = &amp;quot;Zheng, Minghang  and
+      Gong, Shaogang  and
+      Jin, Hailin  and
+      Peng, Yuxin  and
+      Liu, Yang&amp;quot;,
+    booktitle = &amp;quot;Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)&amp;quot;,
+    month = jul,
+    year = &amp;quot;2023&amp;quot;,
+    address = &amp;quot;Toronto, Canada&amp;quot;,
+    publisher = &amp;quot;Association for Computational Linguistics&amp;quot;,
+    url = &amp;quot;https://aclanthology.org/2023.acl-long.794&amp;quot;,
+    pages = &amp;quot;14197--14209&amp;quot;,
+    abstract = &amp;quot;Video sentence localization aims to locate moments in an unstructured video according to a given natural language query. A main challenge is the expensive annotation costs and the annotation bias. In this work, we study video sentence localization in a zero-shot setting, which learns with only video data without any annotation. Existing zero-shot pipelines usually generate event proposals and then generate a pseudo query for each event proposal. However, their event proposals are obtained via visual feature clustering, which is query-independent and inaccurate; and the pseudo-queries are short or less interpretable. Moreover, existing approaches ignores the risk of pseudo-label noise when leveraging them in training. To address the above problems, we propose a Structure-based Pseudo Label generation (SPL), which first generate free-form interpretable pseudo queries before constructing query-dependent event proposals by modeling the event temporal structure. To mitigate the effect of pseudo-label noise, we propose a noise-resistant iterative method that repeatedly re-weight the training sample based on noise estimation to train a grounding model and correct pseudo labels. Experiments on the ActivityNet Captions and Charades-STA datasets demonstrate the advantages of our approach. Code can be found at https://github.com/minghangz/SPL.&amp;quot;,
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h3&gt;
+&lt;p&gt;This work was supported by the grants from the Zhejiang Lab (NO.2022NB0AB05), National Natural Science Foundation of China (61925201,62132001,U22B2048), CAAI-Huawei MindSpore Open Fund, Alan Turing Institute Turing Fellowship, Veritone and Adobe. We thank MindSpore for the partial support of this work, which is a new deep learning computing framework.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Phrase-Level Temporal Relationship Mining for Temporal Sentence Localization</title>
+      <link>https://minghangz.github.io/publication/trm/</link>
+      <pubDate>Tue, 07 Feb 2023 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/trm/</guid>
+      <description>&lt;h3 id=&#34;video&#34;&gt;Video&lt;/h3&gt;
+&lt;div&gt;
+&lt;center&gt;
+&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/sb4ixVYBVtg&#34; title=&#34;YouTube video player&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;/center&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@article{Zheng_Li_Chen_Peng_Liu_2023,
+  title        = {Phrase-Level Temporal Relationship Mining for Temporal Sentence Localization},
+  volume       = {37},
+  url          = {https://ojs.aaai.org/index.php/AAAI/article/view/25478},
+  doi          = {10.1609/aaai.v37i3.25478},
+  abstractnote = {In this paper, we address the problem of video temporal sentence localization, which aims to localize a target moment from videos according to a given language query. We observe that existing models suffer from a sheer performance drop when dealing with simple phrases contained in the sentence. It reveals the limitation that existing models only capture the annotation bias of the datasets but lack sufficient understanding of the semantic phrases in the query. To address this problem, we propose a phrase-level Temporal Relationship Mining (TRM) framework employing the temporal relationship relevant to the phrase and the whole sentence to have a better understanding of each semantic entity in the sentence. Specifically, we use phrase-level predictions to refine the sentence-level prediction, and use Multiple Instance Learning to improve the quality of phrase-level predictions. We also exploit the consistency and exclusiveness constraints of phrase-level and sentence-level predictions to regularize the training process, thus alleviating the ambiguity of each phrase prediction. The proposed approach sheds light on how machines can understand detailed phrases in a sentence and their compositions in their generality rather than learning the annotation biases. Experiments on the ActivityNet Captions and Charades-STA datasets show the effectiveness of our method on both phrase and sentence temporal localization and enable better model interpretability and generalization when dealing with unseen compositions of seen concepts. Code can be found at https://github.com/minghangz/TRM.},
+  number       = {3},
+  journal      = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  author       = {Zheng, Minghang and Li, Sizhe and Chen, Qingchao and Peng, Yuxin and Liu, Yang},
+  year         = {2023},
+  month        = {Jun.},
+  pages        = {3669-3677}
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h3&gt;
+&lt;p&gt;This work was supported by the grants from the National Natural Science Foundation of China (61925201, 62132001, U21B2025, 62201014), Zhejiang Lab (NO.2022NB0AB05), the National Key R&amp;amp;D Program of China (2021YFF0901502) and CAAI-Huawei MindSpore Open Fund.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Weakly Supervised Temporal Sentence Grounding with Gaussian-based Contrastive Proposal Learning</title>
+      <link>https://minghangz.github.io/publication/cpl/</link>
+      <pubDate>Tue, 29 Mar 2022 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/cpl/</guid>
+      <description>&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@inproceedings{CPL_2022_CVPR,
+    title = {Weakly Supervised Temporal Sentence Grounding with Gaussian-based Contrastive Proposal Learning},
+    author = {Zheng, Minghang and Huang, Yanjie and Chen, Qingchao and Peng, Yuxin and Liu, Yang},
+    booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    year = {2022}
+} 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h3&gt;
+&lt;p&gt;This work is supported by the grants from the National Natural Science Foundation of China (61925201, 62132001, U21B2025) and Zhejiang Lab (NO.2022NB0AB05).&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Weakly Supervised Video Moment Localization with Contrastive Negative Sample Mining</title>
+      <link>https://minghangz.github.io/publication/cnm/</link>
+      <pubDate>Tue, 22 Feb 2022 00:00:00 +0000</pubDate>
+      <guid>https://minghangz.github.io/publication/cnm/</guid>
+      <description>&lt;h3 id=&#34;citation&#34;&gt;Citation&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-txt&#34;&gt;@inproceedings{CNM_2022_AAAI,
+    title = {Weakly Supervised Video Moment Localization with Contrastive Negative Sample Mining},
+    author = {Zheng, Minghang and Huang, Yanjie and Chen, Qingchao and Liu, Yang},
+    booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+    year = {2022}
+} 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h3&gt;
+&lt;p&gt;This work is supported by Zhejiang Lab (NO.2022NB0AB05), State Key Laboratory of Media Convergence Production Technology and Systems, National Engineering Laboratory for Big Data Analysis and Applications Technology. The authors would also like to thank Jiabo Huang and Sizhe Li for helpful suggestions.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
