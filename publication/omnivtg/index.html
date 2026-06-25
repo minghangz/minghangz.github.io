@@ -1,0 +1,1670 @@
+<!DOCTYPE html><html lang="en-us" >
+
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  
+  
+    <meta name="generator" content="Wowchemy 5.3.0 for Hugo" />
+  
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+
+  
+  
+  
+    
+      
+      <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&family=Roboto:wght@400;700&display=swap">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Minghang Zheng" />
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Video Temporal Grounding (VTG), the task of localizing video segments from natural language queries, faces significant challenges in open-world applications. These challenges stem from the limited scale and semantic diversity of existing datasets, which lead to a performance gap between common and rare concepts. To overcome these limitations, we introduce OmniVTG, a new large-scale dataset for open-world VTG, coupled with a Self-Correction Chain-of-Thought (CoT) training paradigm designed to enhance the grounding capabilities of Multimodal Large Language Models (MLLMs). Our OmniVTG is constructed via a novel Semantic Coverage Iterative Expansion pipeline, which first identifies gaps in the vocabulary of existing datasets and collects videos that are highly likely to contain these target concepts. For high-quality annotation, we leverage the insight that modern MLLMs excel at dense captioning more than direct grounding and design a caption-centric data engine to prompt MLLMs to generate dense, timestamped descriptions. Beyond the dataset, we observe that simple supervised finetuning (SFT) is insufficient, as a performance gap between rare and common concepts still persists. We find that MLLMs&#39; video understanding ability significantly surpasses their direct grounding ability. Based on this, we propose a Self-Correction Chain-of-Thought (CoT) training paradigm. We train the MLLM to first predict, then use its understanding capabilities to reflect on and refine its own predictions. This capability is instilled via a three-stage pipeline of SFT, CoT finetuning, and reinforcement learning. Extensive experiments show our approach not only excels at open-world grounding in our OmniVTG dataset but also achieves state-of-the-art zero-shot performance on four existing VTG benchmarks. Code is available at https://github.com/oceanflowlab/OmniVTG." />
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://minghangz.github.io/publication/omnivtg/" />
+
+  
+  
+  
+    <meta name="theme-color" content="#1565c0" />
+  
+
+  
+  
+    
+    <script src="/js/mathjax-config.js"></script>
+  
+
+  
+
+  <link rel="stylesheet" href="/css/vendor-bundle.min.f1ecf783c14edc00c9320c205831ad8e.css" media="print" onload="this.media='all'">
+
+  
+  
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.1/css/academicons.min.css" integrity="sha512-W0xM4mr6dEP9nREo7Z9z+9X70wytKvMGeDsj7ps2+xg5QPrEBXC8tAW1IFnzjR6eoJ90JmCnFzerQJTLzIEHjA==" crossorigin="anonymous" media="print" onload="this.media='all'">
+    
+
+    
+    
+    
+    
+      
+      
+    
+    
+    
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/styles/github.min.css" crossorigin="anonymous" title="hl-light" media="print" onload="this.media='all'">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" media="print" onload="this.media='all'" disabled>
+        
+      
+    
+
+    
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.css" integrity="" crossorigin="anonymous" media="print" onload="this.media='all'">
+    
+
+    
+
+    
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+  
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/wowchemy.a0b41be6fa225a8df7a248b87e796d29.css" />
+
+  
+
+
+
+  
+
+  
+
+  
+
+
+
+
+  
+  
+  
+
+  
+
+  
+    <link rel="manifest" href="/manifest.webmanifest" />
+  
+
+  <link rel="icon" type="image/png" href="/media/icon_hub259b9e287cb654bd255d2333b0dd2cd_21941_32x32_fill_lanczos_center_3.png" />
+  <link rel="apple-touch-icon" type="image/png" href="/media/icon_hub259b9e287cb654bd255d2333b0dd2cd_21941_180x180_fill_lanczos_center_3.png" />
+
+  <link rel="canonical" href="https://minghangz.github.io/publication/omnivtg/" />
+
+  
+  
+  
+  
+  
+  
+  
+  
+    
+  
+  
+
+  
+  
+    
+    
+  
+  <meta property="twitter:card" content="summary_large_image" />
+  
+  <meta property="og:site_name" content="Minghang Zheng&#39;s homepage" />
+  <meta property="og:url" content="https://minghangz.github.io/publication/omnivtg/" />
+  <meta property="og:title" content="OmniVTG: A Large-Scale Dataset and Training Paradigm for Open-World Video Temporal Grounding | Minghang Zheng&#39;s homepage" />
+  <meta property="og:description" content="Video Temporal Grounding (VTG), the task of localizing video segments from natural language queries, faces significant challenges in open-world applications. These challenges stem from the limited scale and semantic diversity of existing datasets, which lead to a performance gap between common and rare concepts. To overcome these limitations, we introduce OmniVTG, a new large-scale dataset for open-world VTG, coupled with a Self-Correction Chain-of-Thought (CoT) training paradigm designed to enhance the grounding capabilities of Multimodal Large Language Models (MLLMs). Our OmniVTG is constructed via a novel Semantic Coverage Iterative Expansion pipeline, which first identifies gaps in the vocabulary of existing datasets and collects videos that are highly likely to contain these target concepts. For high-quality annotation, we leverage the insight that modern MLLMs excel at dense captioning more than direct grounding and design a caption-centric data engine to prompt MLLMs to generate dense, timestamped descriptions. Beyond the dataset, we observe that simple supervised finetuning (SFT) is insufficient, as a performance gap between rare and common concepts still persists. We find that MLLMs&#39; video understanding ability significantly surpasses their direct grounding ability. Based on this, we propose a Self-Correction Chain-of-Thought (CoT) training paradigm. We train the MLLM to first predict, then use its understanding capabilities to reflect on and refine its own predictions. This capability is instilled via a three-stage pipeline of SFT, CoT finetuning, and reinforcement learning. Extensive experiments show our approach not only excels at open-world grounding in our OmniVTG dataset but also achieves state-of-the-art zero-shot performance on four existing VTG benchmarks. Code is available at https://github.com/oceanflowlab/OmniVTG." /><meta property="og:image" content="https://minghangz.github.io/publication/omnivtg/featured.png" />
+    <meta property="twitter:image" content="https://minghangz.github.io/publication/omnivtg/featured.png" /><meta property="og:locale" content="en-us" />
+  
+    
+      <meta
+        property="article:published_time"
+        content="2026-03-16T00:00:00&#43;00:00"
+      />
+    
+    <meta property="article:modified_time" content="2026-03-16T00:00:00&#43;00:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://minghangz.github.io/publication/omnivtg/"
+  },
+  "headline": "OmniVTG: A Large-Scale Dataset and Training Paradigm for Open-World Video Temporal Grounding",
+  
+  "image": [
+    "https://minghangz.github.io/publication/omnivtg/featured.png"
+  ],
+  
+  "datePublished": "2026-03-16T00:00:00Z",
+  "dateModified": "2026-03-16T00:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Minghang Zheng"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Minghang Zheng's homepage",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://minghangz.github.io/media/icon_hub259b9e287cb654bd255d2333b0dd2cd_21941_192x192_fill_lanczos_center_3.png"
+    }
+  },
+  "description": "Video Temporal Grounding (VTG), the task of localizing video segments from natural language queries, faces significant challenges in open-world applications. These challenges stem from the limited scale and semantic diversity of existing datasets, which lead to a performance gap between common and rare concepts. To overcome these limitations, we introduce OmniVTG, a new large-scale dataset for open-world VTG, coupled with a Self-Correction Chain-of-Thought (CoT) training paradigm designed to enhance the grounding capabilities of Multimodal Large Language Models (MLLMs). Our OmniVTG is constructed via a novel Semantic Coverage Iterative Expansion pipeline, which first identifies gaps in the vocabulary of existing datasets and collects videos that are highly likely to contain these target concepts. For high-quality annotation, we leverage the insight that modern MLLMs excel at dense captioning more than direct grounding and design a caption-centric data engine to prompt MLLMs to generate dense, timestamped descriptions. Beyond the dataset, we observe that simple supervised finetuning (SFT) is insufficient, as a performance gap between rare and common concepts still persists. We find that MLLMs' video understanding ability significantly surpasses their direct grounding ability. Based on this, we propose a Self-Correction Chain-of-Thought (CoT) training paradigm. We train the MLLM to first predict, then use its understanding capabilities to reflect on and refine its own predictions. This capability is instilled via a three-stage pipeline of SFT, CoT finetuning, and reinforcement learning. Extensive experiments show our approach not only excels at open-world grounding in our OmniVTG dataset but also achieves state-of-the-art zero-shot performance on four existing VTG benchmarks. Code is available at https://github.com/oceanflowlab/OmniVTG."
+}
+</script>
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+  <title>OmniVTG: A Large-Scale Dataset and Training Paradigm for Open-World Video Temporal Grounding | Minghang Zheng&#39;s homepage</title>
+</head>
+
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" class="page-wrapper   " data-wc-page-id="df631bdd6f675d33669effd0cc32acc8" >
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <script src="/js/wowchemy-init.min.2da3b1fa37e894630bf6de39b1b694b3.js"></script>
+
+  
+
+
+<aside class="search-modal" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#" aria-label="Close"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control"
+        aria-label="Search...">
+        
+      </div>
+
+      
+      
+
+      
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+
+  <div class="page-header">
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container-xl">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Minghang Zheng&#39;s homepage</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Minghang Zheng&#39;s homepage</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+
+        
+        
+        
+        
+
+        
+          
+            
+            
+          
+          
+            
+            
+            
+              
+            
+            
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+
+        
+        
+        
+        
+
+        
+          
+            
+            
+          
+          
+            
+            
+            
+              
+            
+            
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#featured"><span>Publications</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+
+        
+        
+        
+        
+
+        
+          
+            
+            
+          
+          
+            
+            
+            
+              
+            
+            
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+
+      
+      
+        
+          
+          <li class="nav-item d-none d-lg-inline-flex">
+            <a class="nav-link" href="https://github.com/minghangz" data-toggle="tooltip" data-placement="bottom" title="Follow me on Github" target="_blank" rel="noopener" aria-label="Follow me on Github">
+              <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+          </li>
+        
+      
+
+      
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      
+      <li class="nav-item dropdown theme-dropdown">
+        <a href="#" class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-label="Display preferences">
+          <i class="fas fa-moon" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item js-set-theme-light">
+            <span>Light</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-dark">
+            <span>Dark</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-auto">
+            <span>Automatic</span>
+          </a>
+        </div>
+      </li>
+      
+
+      
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  </div>
+
+  <div class="page-body">
+    
+
+
+
+
+
+
+
+
+<div class="pub">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+<div class="article-container pt-3">
+  <h1>OmniVTG: A Large-Scale Dataset and Training Paradigm for Open-World Video Temporal Grounding</h1>
+
+  
+
+  
+
+
+<div class="article-metadata">
+
+  
+  
+    
+    
+    <div class=authors>
+      
+
+  <span class="author-highlighted">
+      <a href="https://minghangz.github.io/" target="_blank" rel="noopener noreferrer">Minghang Zheng</a></span>, <span >
+      Zihao Yin</span>, <span >
+      Yi Yang</span>, <span >
+      <a href="https://mipl.pku.edu.cn/pengyuxin/" target="_blank" rel="noopener noreferrer">Yuxin Peng</a></span>, <span >
+      <a href="https://www.csyangliu.com/" target="_blank" rel="noopener noreferrer">Yang Liu</a></span>
+    </div>
+    
+  
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    March 2026
+  </span>
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="pub-publication">
+    Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition
+    <b>CVPR</b>
+  </span>
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+  
+
+</div>
+  
+
+
+
+
+<div class="btn-links mb-3">
+  
+  
+
+
+
+
+
+
+
+
+  
+    
+  
+
+
+
+<a class="btn btn-outline-primary btn-page-header" href="https://arxiv.org/abs/2604.25276" target="_blank" rel="noopener">
+  PDF
+</a>
+
+
+
+<a href="#" class="btn btn-outline-primary btn-page-header js-cite-modal"
+        data-filename="/publication/omnivtg/cite.bib">
+  Cite
+</a>
+
+
+  
+  
+    
+  
+<a class="btn btn-outline-primary btn-page-header" href="https://github.com/oceanflowlab/OmniVTG" target="_blank" rel="noopener">
+  Code
+</a>
+
+
+
+
+
+
+  
+  
+    
+  
+<a class="btn btn-outline-primary btn-page-header" href="/uploads/OmniVTG/poster.pdf" target="_blank" rel="noopener">
+  Poster
+</a>
+
+
+
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  
+  
+  
+    
+  
+  <a class="btn btn-outline-primary btn-page-header" href="https://huggingface.co/zhengmh/OmniVTG-7B" target="_blank" rel="noopener">
+    Model</a>
+
+  
+  
+  
+    
+  
+  
+  
+  
+  
+    
+  
+  <a class="btn btn-outline-primary btn-page-header" href="https://huggingface.co/datasets/zhengmh/OmniVTG-Dataset" target="_blank" rel="noopener">
+    Dataset</a>
+
+</div>
+
+
+</div>
+
+
+<div class="article-header article-container featured-image-wrapper mt-4 mb-4" style="max-width: 960px; max-height: 528px;">
+  <div style="position: relative">
+    <img src="/publication/omnivtg/featured_huf3de03753f4571f905dc9a0065e3fde5_455293_960x2500_fit_q75_h2_lanczos_3.webp" width="960" height="528" alt="" class="featured-image">
+    
+  </div>
+</div>
+
+
+  <div class="article-container">
+
+    
+    <h3>Abstract</h3>
+    <p class="pub-abstract">Video Temporal Grounding (VTG), the task of localizing video segments from natural language queries, faces significant challenges in open-world applications. These challenges stem from the limited scale and semantic diversity of existing datasets, which lead to a performance gap between common and rare concepts. To overcome these limitations, we introduce OmniVTG, a new large-scale dataset for open-world VTG, coupled with a Self-Correction Chain-of-Thought (CoT) training paradigm designed to enhance the grounding capabilities of Multimodal Large Language Models (MLLMs). Our OmniVTG is constructed via a novel Semantic Coverage Iterative Expansion pipeline, which first identifies gaps in the vocabulary of existing datasets and collects videos that are highly likely to contain these target concepts. For high-quality annotation, we leverage the insight that modern MLLMs excel at dense captioning more than direct grounding and design a caption-centric data engine to prompt MLLMs to generate dense, timestamped descriptions. Beyond the dataset, we observe that simple supervised finetuning (SFT) is insufficient, as a performance gap between rare and common concepts still persists. We find that MLLMs' video understanding ability significantly surpasses their direct grounding ability. Based on this, we propose a Self-Correction Chain-of-Thought (CoT) training paradigm. We train the MLLM to first predict, then use its understanding capabilities to reflect on and refine its own predictions. This capability is instilled via a three-stage pipeline of SFT, CoT finetuning, and reinforcement learning. Extensive experiments show our approach not only excels at open-world grounding in our OmniVTG dataset but also achieves state-of-the-art zero-shot performance on four existing VTG benchmarks. Code is available at <a href="https://github.com/oceanflowlab/OmniVTG">https://github.com/oceanflowlab/OmniVTG</a>.</p>
+    
+
+    
+
+    
+
+    <div class="article-style"><h2 id="video">Video</h2>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+    <iframe src="https://www.youtube.com/embed/lrCdZU1fxQ8?si=TBNnnuP0Lp6BI_Qu" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
+            allowfullscreen
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+    </iframe>
+</div>
+<hr>
+<h2 id="method">Method</h2>
+<div style="background: var(--vtg-card-bg); padding: 24px; border-radius: 16px; box-shadow: 0 4px 20px -10px rgba(0,0,0,0.1); border: 1px solid var(--vtg-border); margin-bottom: 32px;">
+  <img src="/uploads/OmniVTG/method.png" alt="OmniVTG Method Pipeline" style="width:100%; border-radius: 8px; margin-bottom: 20px;">
+  <div style="font-size: 0.95rem; line-height: 1.6; color: var(--vtg-text-main);">
+    <strong>Ours Contributions</strong>
+    <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; color: var(--vtg-text-sub);">
+      <li style="margin-bottom: 6px;"><strong style="color: var(--vtg-text-main);">OmniVTG Dataset:</strong> over 2,000 hours of video and rich semantic diversity</li>
+      <li style="margin-bottom: 6px;"><strong style="color: var(--vtg-text-main);">Data Engine:</strong> Semantic Coverage Iterative Expansion pipeline to discover out-of-vocabulary concepts, combined with a caption-centric prompting strategy to automately generate dense, high-quality grounding annotations</li></li>
+      <li style="margin-bottom: 6px;"><strong style="color: var(--vtg-text-main);">Self-Correction CoT:</strong> first make a coarse prediction of the target timestamps, then zoom in and refine it using its video understanding capabilities</li>
+    </ul>
+  </div>
+</div>
+<hr>
+<h2 id="visualizations">Visualizations</h2>
+<style>
+/* Modern typography and base variables */
+:root {
+  --vtg-primary: #007aff;
+  --vtg-success: #34c759;
+  --vtg-info: #5ac8fa;
+  --vtg-bg: #f5f5f7;
+  --vtg-card-bg: #ffffff;
+  --vtg-text-main: #1d1d1f;
+  --vtg-text-sub: #86868b;
+  --vtg-border: rgba(0,0,0,0.08);
+}
+
+.omnivtg-viz {
+  margin: 24px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--vtg-text-main);
+}
+
+.omnivtg-viz h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 32px 0 16px;
+  color: var(--vtg-text-main);
+  border: none;
+}
+
+/* Gallery Card Container */
+.omnivtg-carousel {
+  background: var(--vtg-card-bg);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  margin-bottom: 32px;
+  border: 1px solid var(--vtg-border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.omnivtg-carousel:hover {
+  box-shadow: 0 12px 40px -10px rgba(0,0,0,0.15);
+}
+
+.omnivtg-carousel .carousel-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Video Section with Overlay Navigation */
+.omnivtg-carousel .video-section {
+  position: relative;
+  background: #000;
+  aspect-ratio: 16/9;
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid var(--vtg-border);
+}
+
+.omnivtg-carousel .video-section video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Overlay Navigation Buttons */
+.omnivtg-carousel .nav-btn-overlay {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+.omnivtg-carousel .video-section:hover .nav-btn-overlay {
+  opacity: 1;
+}
+
+.omnivtg-carousel .nav-btn-overlay:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.omnivtg-carousel .nav-btn-overlay:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.nav-left { left: 16px; }
+.nav-right { right: 16px; }
+
+/* Info Section */
+.omnivtg-carousel .info-section {
+  padding: 20px 24px;
+}
+
+.omnivtg-carousel .header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.omnivtg-carousel .counter-badge {
+  background: var(--vtg-bg);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--vtg-text-sub);
+  letter-spacing: 0.5px;
+}
+
+.omnivtg-carousel .query-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--vtg-bg);
+  padding: 4px;
+  border-radius: 20px;
+}
+
+.omnivtg-carousel .qnav-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--vtg-text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+
+.omnivtg-carousel .qnav-btn:hover {
+  background: var(--vtg-primary);
+  color: white;
+}
+
+.omnivtg-carousel .qnav-indicator {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--vtg-text-main);
+  padding: 0 8px;
+}
+
+/* Query Box */
+.omnivtg-carousel .query-box {
+  background: var(--vtg-bg);
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--vtg-text-main);
+  position: relative;
+}
+
+.omnivtg-carousel .query-label {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--vtg-text-sub);
+  margin-bottom: 4px;
+}
+
+/* Timeline Aesthetics */
+.omnivtg-carousel .timeline-bar-outer {
+  position: relative;
+  height: 8px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 4px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.omnivtg-carousel .timeline-bar-inner {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+/* Jump Buttons */
+.omnivtg-carousel .jump-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.omnivtg-carousel .jump-btn {
+  background: white;
+  border: 1px solid var(--vtg-border);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--vtg-text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.omnivtg-carousel .jump-btn:hover {
+  background: var(--vtg-bg);
+  border-color: rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+/* Model Output Rows */
+.omnivtg-carousel .model-row {
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid var(--vtg-border);
+}
+
+.omnivtg-carousel .model-row.gt {
+  background: rgba(52, 199, 89, 0.04);
+  border-color: rgba(52, 199, 89, 0.2);
+}
+
+.omnivtg-carousel .model-row.omni {
+  background: rgba(0, 122, 255, 0.04);
+  border-color: rgba(0, 122, 255, 0.2);
+}
+
+.omnivtg-carousel .model-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.omnivtg-carousel .model-row.gt .model-label { color: var(--vtg-success); }
+.omnivtg-carousel .model-row.omni .model-label { color: var(--vtg-primary); }
+
+.omnivtg-carousel .think-text {
+  font-size: 0.85rem;
+  color: #4b5563;
+  background: rgba(255,255,255,0.6);
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 8px 0;
+  border: 1px solid var(--vtg-border);
+  line-height: 1.5;
+}
+
+.omnivtg-carousel .init-pred-row {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--vtg-border);
+}
+
+.omnivtg-carousel .init-pred-row .pred-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--vtg-info);
+  margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+  .omnivtg-carousel .info-section { padding: 16px; }
+  .omnivtg-carousel .nav-btn-overlay { width: 36px; height: 36px; font-size: 14px; }
+  .nav-left { left: 8px; }
+  .nav-right { right: 8px; }
+}
+</style>
+<div class="omnivtg-viz">
+<h4>OmniVTG Dataset Samples</h4>
+<div class="omnivtg-carousel" id="carousel-omni">
+  <div class="carousel-inner">
+    <div class="video-section">
+      <button class="nav-btn-overlay nav-left" onclick="navVideo('omni', -1)" title="Previous video">&#10094;</button>
+      <video id="video-omni" controls preload="metadata" playsinline></video>
+      <button class="nav-btn-overlay nav-right" onclick="navVideo('omni', 1)" title="Next video">&#10095;</button>
+    </div>
+    <div class="info-section">
+      <div class="header-row">
+        <div class="counter-badge">Video <strong id="vididx-omni">1</strong> / <span id="vidtotal-omni">5</span></div>
+        <div class="query-nav">
+          <button class="qnav-btn" onclick="navQuery('omni', -1)" title="Previous query">&#10094;</button>
+          <span class="qnav-indicator">Query <strong id="qidx-omni">1</strong>/<span id="qtotal-omni">7</span></span>
+          <button class="qnav-btn" onclick="navQuery('omni', 1)" title="Next query">&#10095;</button>
+        </div>
+      </div>
+      <div class="query-box">
+        <div class="query-label">Current Query</div>
+        <div id="querytext-omni"></div>
+      </div>
+      <div id="timeline-omni"></div>
+    </div>
+  </div>
+</div>
+<h4>Qualitative Comparison: OmniVTG Test Set</h4>
+<div class="omnivtg-carousel" id="carousel-omni-test">
+  <div class="carousel-inner">
+    <div class="video-section">
+      <button class="nav-btn-overlay nav-left" onclick="navVideo('omni-test', -1)" title="Previous case">&#10094;</button>
+      <video id="video-omni-test" controls preload="metadata" playsinline></video>
+      <button class="nav-btn-overlay nav-right" onclick="navVideo('omni-test', 1)" title="Next case">&#10095;</button>
+    </div>
+    <div class="info-section">
+      <div class="header-row">
+        <div class="counter-badge">Case <strong id="vididx-omni-test">1</strong> / <span id="vidtotal-omni-test">5</span></div>
+        <span style="font-size:0.75rem;color:var(--vtg-text-sub);">Use arrow keys to browse</span>
+      </div>
+      <div class="query-box">
+        <div class="query-label">Query</div>
+        <div id="querytext-omni-test"></div>
+      </div>
+      <div id="models-omni-test"></div>
+    </div>
+  </div>
+</div>
+<h4>Qualitative Comparison: Charades-STA</h4>
+<div class="omnivtg-carousel" id="carousel-charades">
+  <div class="carousel-inner">
+    <div class="video-section">
+      <button class="nav-btn-overlay nav-left" onclick="navVideo('charades', -1)" title="Previous case">&#10094;</button>
+      <video id="video-charades" controls preload="metadata" playsinline></video>
+      <button class="nav-btn-overlay nav-right" onclick="navVideo('charades', 1)" title="Next case">&#10095;</button>
+    </div>
+    <div class="info-section">
+      <div class="header-row">
+        <div class="counter-badge">Case <strong id="vididx-charades">1</strong> / <span id="vidtotal-charades">4</span></div>
+        <span style="font-size:0.75rem;color:var(--vtg-text-sub);">Use arrow keys to browse</span>
+      </div>
+      <div class="query-box">
+        <div class="query-label">Query</div>
+        <div id="querytext-charades"></div>
+      </div>
+      <div id="models-charades"></div>
+    </div>
+  </div>
+</div>
+<h4>Qualitative Comparison: ActivityNet Captions</h4>
+<div class="omnivtg-carousel" id="carousel-activitynet">
+  <div class="carousel-inner">
+    <div class="video-section">
+      <button class="nav-btn-overlay nav-left" onclick="navVideo('activitynet', -1)" title="Previous case">&#10094;</button>
+      <video id="video-activitynet" controls preload="metadata" playsinline></video>
+      <button class="nav-btn-overlay nav-right" onclick="navVideo('activitynet', 1)" title="Next case">&#10095;</button>
+    </div>
+    <div class="info-section">
+      <div class="header-row">
+        <div class="counter-badge">Case <strong id="vididx-activitynet">1</strong> / <span id="vidtotal-activitynet">4</span></div>
+        <span style="font-size:0.75rem;color:var(--vtg-text-sub);">Use arrow keys to browse</span>
+      </div>
+      <div class="query-box">
+        <div class="query-label">Query</div>
+        <div id="querytext-activitynet"></div>
+      </div>
+      <div id="models-activitynet"></div>
+    </div>
+  </div>
+</div>
+</div>
+<script src="/uploads/OmniVTG/data.js"></script>
+<script>
+(function() {
+  // --- STATE ---
+  const state = {
+    omni:       { vIdx: 0, qIdx: 0 },
+    'omni-test':{ vIdx: 0 },
+    charades:   { vIdx: 0 },
+    activitynet:{ vIdx: 0 }
+  };
+
+  // --- HELPERS ---
+  function fmtTime(s) {
+    if (s == null) return '00:00';
+    const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+    return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+  }
+
+  function timelineHTML(start, end, duration, color) {
+    const left = Math.max(0, start / duration * 100);
+    let w = Math.max(0, (end - start) / duration * 100);
+    if (w < 0.5) w = 0.5;
+    const tip = fmtTime(start) + ' - ' + fmtTime(end) + ' (' + start.toFixed(1) + 's - ' + end.toFixed(1) + 's)';
+    return '<div class="timeline-bar-outer"><div class="timeline-bar-inner" style="left:'+left+'%;width:'+w+'%;background:'+color+'" title="'+tip+'"></div></div>';
+  }
+
+  function jumpBtnsHTML(videoId, start, end) {
+    return '<div class="jump-btns">' +
+      '<button class="jump-btn" onclick="seekV(\''+videoId+'\','+start+')"><span style="font-size:10px">&#9654;</span> Start: '+fmtTime(start)+'</button>' +
+      '<button class="jump-btn" onclick="seekV(\''+videoId+'\','+end+')"><span style="font-size:10px">&#9654;</span> End: '+fmtTime(end)+'</button>' +
+      '</div>';
+  }
+
+  window.seekV = function(vidId, t) {
+    var v = document.getElementById(vidId);
+    if (v) { v.currentTime = t; v.play().catch(function(){}); }
+  };
+
+  // --- RENDER: OMNI DATASET ---
+  window.renderOmni = function() {
+    var s = state.omni;
+    var keys = Object.keys(data_omni);
+    if (s.vIdx >= keys.length) s.vIdx = 0;
+    if (s.vIdx < 0) s.vIdx = keys.length - 1;
+    var key = keys[s.vIdx];
+    var info = data_omni[key];
+    var annos = info.annotations;
+    if (s.qIdx >= annos.length) s.qIdx = 0;
+    if (s.qIdx < 0) s.qIdx = annos.length - 1;
+    var anno = annos[s.qIdx];
+
+    document.getElementById('vididx-omni').textContent = s.vIdx + 1;
+    document.getElementById('vidtotal-omni').textContent = keys.length;
+    document.getElementById('qidx-omni').textContent = s.qIdx + 1;
+    document.getElementById('qtotal-omni').textContent = annos.length;
+    document.getElementById('querytext-omni').textContent = anno.query;
+
+    var vid = document.getElementById('video-omni');
+    var oldSrc = vid.querySelector('source');
+    if (oldSrc) oldSrc.remove();
+    var src = document.createElement('source');
+    src.src = info.video_path;
+    src.type = 'video/mp4';
+    vid.appendChild(src);
+    vid.load();
+
+    var dur = info.duration;
+    var tl = timelineHTML(anno.timestamps[0], anno.timestamps[1], dur, 'var(--vtg-success)');
+    var jb = jumpBtnsHTML('video-omni', anno.timestamps[0], anno.timestamps[1]);
+    document.getElementById('timeline-omni').innerHTML = tl + jb;
+  };
+
+  // --- RENDER: COMPARISON DATASETS ---
+  function renderComp(sectionId, dataArr) {
+    var s = state[sectionId];
+    if (s.vIdx >= dataArr.length) s.vIdx = 0;
+    if (s.vIdx < 0) s.vIdx = dataArr.length - 1;
+    var item = dataArr[s.vIdx];
+    var meta = item.meta_data;
+    var dur = meta.duration;
+    var vidId = 'video-' + sectionId;
+
+    document.getElementById('vididx-' + sectionId).textContent = s.vIdx + 1;
+    document.getElementById('vidtotal-' + sectionId).textContent = dataArr.length;
+    document.getElementById('querytext-' + sectionId).textContent = meta.query;
+
+    var vid = document.getElementById(vidId);
+    var oldSrc = vid.querySelector('source');
+    if (oldSrc) oldSrc.remove();
+    var src = document.createElement('source');
+    src.src = item.video_path;
+    src.type = 'video/mp4';
+    vid.appendChild(src);
+    vid.load();
+
+    var html = '';
+
+    // GT
+    if (item.GT) {
+      html += '<div class="model-row gt"><div class="model-label"><span>🎯</span> Ground Truth</div>';
+      html += timelineHTML(item.GT[0], item.GT[1], dur, 'var(--vtg-success)');
+      html += jumpBtnsHTML(vidId, item.GT[0], item.GT[1]);
+      html += '</div>';
+    }
+
+    // OmniVTG (Ours)
+    if (item.OmniVTG) {
+      html += '<div class="model-row omni"><div class="model-label"><span>✨</span> OmniVTG (Ours)</div>';
+      if (item.OmniVTG.think) {
+        html += '<div class="think-text"><strong>🤔 Think:</strong> ' + item.OmniVTG.think + '</div>';
+      }
+      if (item.OmniVTG.init_pred) {
+        html += '<div class="init-pred-row"><div class="pred-label">Initial Prediction:</div>';
+        html += timelineHTML(item.OmniVTG.init_pred[0], item.OmniVTG.init_pred[1], dur, 'var(--vtg-info)');
+        html += jumpBtnsHTML(vidId, item.OmniVTG.init_pred[0], item.OmniVTG.init_pred[1]);
+        html += '</div>';
+      }
+      html += '<div><span style="font-size:0.75rem;font-weight:600;color:var(--vtg-primary);">Final Prediction:</span>';
+      html += timelineHTML(item.OmniVTG.pred[0], item.OmniVTG.pred[1], dur, 'var(--vtg-primary)');
+      html += jumpBtnsHTML(vidId, item.OmniVTG.pred[0], item.OmniVTG.pred[1]);
+      html += '</div></div>';
+    }
+
+    document.getElementById('models-' + sectionId).innerHTML = html;
+  }
+
+  // --- NAVIGATION ---
+  window.navVideo = function(sectionId, dir) {
+    var s = state[sectionId];
+    var dataArr;
+    if (sectionId === 'omni') {
+      s.vIdx += dir;
+    } else if (sectionId === 'omni-test') {
+      s.vIdx += dir;
+      dataArr = data_omni_test;
+    } else if (sectionId === 'charades') {
+      s.vIdx += dir;
+      dataArr = data_charades;
+    } else if (sectionId === 'activitynet') {
+      s.vIdx += dir;
+      dataArr = data_activitynet;
+    }
+    // wrap
+    if (sectionId === 'omni') {
+      var keys = Object.keys(data_omni);
+      if (s.vIdx >= keys.length) s.vIdx = 0;
+      if (s.vIdx < 0) s.vIdx = keys.length - 1;
+      s.qIdx = 0;
+      window.renderOmni();
+    } else {
+      if (s.vIdx >= dataArr.length) s.vIdx = 0;
+      if (s.vIdx < 0) s.vIdx = dataArr.length - 1;
+      renderComp(sectionId, dataArr);
+    }
+  };
+
+  window.navQuery = function(sectionId, dir) {
+    if (sectionId !== 'omni') return;
+    state.omni.qIdx += dir;
+    window.renderOmni();
+  };
+
+  // --- KEYBOARD SUPPORT ---
+  document.addEventListener('keydown', function(e) {
+    var sections = ['omni', 'omni-test', 'charades', 'activitynet'];
+    for (var i = 0; i < sections.length; i++) {
+      var el = document.getElementById('carousel-' + sections[i]);
+      if (!el) continue;
+      var rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); navVideo(sections[i], -1); return; }
+        if (e.key === 'ArrowRight') { e.preventDefault(); navVideo(sections[i], 1); return; }
+        if (e.key === 'ArrowUp') { e.preventDefault(); navQuery(sections[i], -1); return; }
+        if (e.key === 'ArrowDown') { e.preventDefault(); navQuery(sections[i], 1); return; }
+        break;
+      }
+    }
+  });
+
+  // --- INIT ---
+  function init() {
+    if (typeof data_omni !== 'undefined') window.renderOmni();
+    if (typeof data_omni_test !== 'undefined') renderComp('omni-test', data_omni_test);
+    if (typeof data_charades !== 'undefined') renderComp('charades', data_charades);
+    if (typeof data_activitynet !== 'undefined') renderComp('activitynet', data_activitynet);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+<hr>
+<h2 id="citation">Citation</h2>
+<pre><code class="language-txt">@InProceedings{Zheng_2026_CVPR,
+    author    = {Zheng, Minghang and Yin, Zihao and Yang, Yi and Peng, Yuxin and Liu, Yang},
+    title     = {OmniVTG: A Large-Scale Dataset and Training Paradigm for Open-World Video Temporal Grounding},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2026},
+    pages     = {24620-24629}
+}
+</code></pre>
+</div>
+
+    
+
+  </div>
+</div>
+  </div>
+
+  <div class="page-footer">
+    
+    
+    <div class="container">
+      <footer class="site-footer">
+
+  
+
+
+
+  
+
+  
+  
+  <span class="powered-by">
+    <i>Last updated: 25 June 2026</i>
+  </span>
+
+  
+  <p class="powered-by">
+    Copyright © 2026 Minghang Zheng
+  </p>
+  
+
+  
+  
+
+
+
+
+
+
+  
+</footer>
+    </div>
+    
+  </div>
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      
+
+    
+    <script src="/js/vendor-bundle.min.b73dfaac3b6499dc997741748a7c3fe2.js"></script>
+
+    
+    
+    
+      
+      
+        <script src="https://cdn.jsdelivr.net/gh/desandro/imagesloaded@v4.1.4/imagesloaded.pkgd.min.js" integrity="sha512-S5PZ9GxJZO16tT9r3WJp/Safn31eu8uWrzglMahDT4dsmgqWonRY9grk3j+3tfuPr9WJNsfooOR7Gi7HL5W2jw==" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/gh/metafizzy/isotope@v3.0.6/dist/isotope.pkgd.min.js" integrity="sha512-Zq2BOxyhvnRFXu0+WE6ojpZLOU2jdnqbrM1hmVdGzyeCa1DgM3X5Q4A/Is9xA1IkbUeDd7755dNNI/PzSf2Pew==" crossorigin="anonymous"></script>
+      
+
+      
+      
+
+      
+
+      
+        
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/highlight.min.js" integrity="sha512-Ypjm0o7jOxAd4hpdoppSEN0TQOC19UtPAqD+4s5AlXmUvbmmS/YMxYqAqarQYyxTnB6/rqip9qcxlNB/3U9Wdg==" crossorigin="anonymous"></script>
+        
+        
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/languages/r.min.js" crossorigin="anonymous"></script>
+        
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/languages/python.min.js" crossorigin="anonymous"></script>
+        
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/languages/latex.min.js" crossorigin="anonymous"></script>
+        
+      
+
+    
+
+    
+    
+    
+      <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.min.js" integrity="" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+    
+      
+      <script id="search-hit-fuse-template" type="text/x-template">
+        <div class="search-hit" id="summary-{{key}}">
+          <div class="search-hit-content">
+            <div class="search-hit-name">
+              <a href="{{relpermalink}}">{{title}}</a>
+              <div class="article-metadata search-hit-type">{{type}}</div>
+              <p class="search-hit-description">{{snippet}}</p>
+            </div>
+          </div>
+        </div>
+      </script>
+      
+        <script src="https://cdn.jsdelivr.net/gh/krisk/Fuse@v3.2.1/dist/fuse.min.js" integrity="sha512-o38bmzBGX+hD3JHWUFCDA09btWaqrNmoJ3RXLlrysA7PP01Kgs4UlE4MhelE1v5dJR3+cxlR4qQlotsW7jKsnw==" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/gh/julmot/mark.js@8.11.1/dist/jquery.mark.min.js" integrity="sha512-mhbv5DqBMgrWL+32MmsDOt/OAvqr/cHimk6B8y/bx/xS88MVkYGPiVv2ixKVrkywF2qHplNRUvFsAHUdxZ3Krg==" crossorigin="anonymous"></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+      
+      
+      
+      
+      
+      
+      
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+      
+      
+    
+    
+    <script src="/en/js/wowchemy.min.7cd6ec29d281a73c92a2958a1584aadc.js"></script>
+
+    <script>
+  $('[data-toggle="tooltip"]').tooltip({
+    trigger : 'hover'
+  })
+  if ($(".pub").length > 0) {
+    $("head title").text($(".pub h1").text())
+    $("link[rel='icon']").remove()
+    $(".page-header").hide()
+    $(".page-footer").hide()
+    
+  }
+  
+</script>
+
+
+</body>
+</html>
